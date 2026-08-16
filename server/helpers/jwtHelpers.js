@@ -1,6 +1,22 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'my-super-duper-secret-secret';
+const MIN_SECRET_LENGTH = 16;
+
+const requireSecret = (name) => {
+    const value = process.env[name];
+
+    if (!value || value.trim() === '') {
+        throw new Error(`Environment variable ${name} is not set; refusing to start.`);
+    }
+
+    if (value.length < MIN_SECRET_LENGTH) {
+        throw new Error(`Environment variable ${name} is too short (${value.length} chars); min ${MIN_SECRET_LENGTH} characters required.`);
+    }
+
+    return value;
+};
+
+const JWT_SECRET = requireSecret('JWT_SECRET');
 const JWT_EXPIRATION = '7d';
 
 export const generateToken = (user) => {
