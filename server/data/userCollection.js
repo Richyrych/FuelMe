@@ -127,9 +127,7 @@ export const addUser = async (
     }
 
     const newUserId = insertUserInfo.insertedId.toString();
-    const theUser = await getUserById(newUserId);
-
-    return theUser;
+    return await getUserById(newUserId);
 };
 
 // Get user by id
@@ -141,7 +139,8 @@ export const getUserById = async (userId) => {
     const userCollection = await users();
 
     const currentUser = await userCollection.findOne(
-        { _id: new ObjectId(userId) }
+        { _id: new ObjectId(userId) },
+        { projection: { password_hash: 0 } }
     );
 
     if (!currentUser) {
@@ -203,8 +202,7 @@ export const editUser = async (userId, updatedUser) => {
     if (updatedUser.password !== undefined) {
         const checkedPassword = helpers.checkPassword(updatedUser.password, "Password");
         const saltRounds = 10;
-        const passwordHash = await bcrypt.hash(checkedPassword, saltRounds);
-        updatedUserData.password_hash = passwordHash;
+        updatedUserData.password_hash = await bcrypt.hash(checkedPassword, saltRounds);
     }
 
     if (updatedUser.sex !== undefined) {
@@ -342,15 +340,16 @@ export const editUser = async (userId, updatedUser) => {
         throw new Error ("Oh no! User could not be updated :(");
     }
 
-    const updatedDoc = await getUserById(userId);
-    return updatedDoc;
+    return await getUserById(userId);
 };
 
 // Get all users
 export const getAllUsers = async () => {
     const userCollection = await users();
 
-    let allUsers = await userCollection.find({}).toArray();
+    let allUsers = await userCollection
+        .find({}, { projection: { password_hash: 0 } })
+        .toArray();
 
     if (allUsers.length === 0) {
         return [];
