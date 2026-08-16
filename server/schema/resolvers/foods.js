@@ -6,7 +6,7 @@ import { getCache, setCache, deleteCache, } from '../../config/redisConnection.j
 
 export const resolvers = {
     Query: {
-        getFoodById: async (_, args) => {
+        getFoodById: async (_, args, context) => {
             const cacheKey = `food:${args._id}`;
 
 			let food;
@@ -16,7 +16,6 @@ export const resolvers = {
 					food = cached;
 				} else {
 					food = await foodData.getFoodById(args._id);
-					await setCache(cacheKey, food);
 				}
 			} catch (error) {
 				if (error.message.includes('not found')) {
@@ -28,6 +27,13 @@ export const resolvers = {
 
 			if (!food.is_public && food.added_by !== context.user?.id) {
 				throwGraphQLError(`Food ${args._id} not found`, 'NOT_FOUND');
+			}
+
+			// Cache after visibility check, and only public foods
+			if (food.is_public) {
+				try {
+					await setCache(cacheKey, food);
+				} catch { }
 			}
 
 			return food;
@@ -77,8 +83,7 @@ export const resolvers = {
 			const { filters, page = 1, limit = 20 } = args;
 			
 			try {
-				const results = await searchFoods(filters || {}, page, limit);
-				return results;
+				return await searchFoods(filters || {}, page, limit);
 			} catch (error) {
 				throwGraphQLError(error.message, 'INTERNAL_SERVER_ERROR');
 			}
