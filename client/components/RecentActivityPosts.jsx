@@ -3,7 +3,7 @@ import React, {useContext, useMemo} from "react";
 import Link from "next/link";
 import {useQuery} from "@apollo/client/react";
 import queries from "../queries/blogQueries.js";
-import {AuthContext} from "../lib/userAuthContext";
+import {AuthContext} from "@/lib/userAuthContext";
 import conversionHelpers from "../helpers/conversionHelpers";
 
 // Import Tailwind
@@ -20,22 +20,19 @@ export default function RecentActivity() {
     const userAuth = useContext(AuthContext);
     const currentUser = userAuth.user;
 
-    const { data, loading, error } = useQuery(queries.GET_BLOGS);
+    const { data, loading, error } = useQuery(queries.GET_USER_BLOGS, {
+        variables: { user_id: currentUser?._id },
+        skip: !currentUser?._id
+    });
 
     const myRecentPosts = useMemo(() => {
         let postResults = [];
 
-        if (!currentUser || !currentUser._id) {
+        if (!data || !data.getBlogsByUser) {
             return postResults;
         }
 
-        if (!data || !data.blogs) {
-            return postResults;
-        }
-
-        postResults = data.blogs.filter((post) => {
-            return post.user_id === currentUser._id;
-        });
+        postResults = [...data.getBlogsByUser];
 
         // Ensure the posts are sequences properly
         postResults.sort((a, b) => {
@@ -45,7 +42,7 @@ export default function RecentActivity() {
         });
 
         return postResults.slice(0, 3);
-    }, [data, currentUser]);
+    }, [data]);
 
     // Display recent activity window
     return (

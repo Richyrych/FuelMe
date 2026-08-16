@@ -39,7 +39,7 @@ export const getBlogsByUser = async (userId) => {
 	userId = helpers.checkId(userId, "User ID");
 	
     const blogsCollection = await blogs();
-    const userBlogs = await blogsCollection.find({user_id: new ObjectId(userId)}).toArray();
+    const userBlogs = await blogsCollection.find({user_id: userId}).toArray();
 
     if(!userBlogs){
         throw new Error("posts could not be found");
@@ -102,7 +102,7 @@ export const updateBlog = async (id, updateInfo) => {
 		throw new Error("Could not find blog post");
 	}
 
-	//updateable fields: title, content, post_type, updated_at
+	//updatable fields: title, content, post_type, updated_at
 	if(updateInfo.title){
 		blog.title = helpers.checkString(updateInfo.title, 'Title');
 	}
@@ -114,9 +114,8 @@ export const updateBlog = async (id, updateInfo) => {
 	}
 
     //create the date and format it as MM/DD/YYYY
-    let date = new Date(); 
-    let dateStr = `${date.toLocaleString('default', {month: '2-digit'})}/${date.toLocaleString('default', {day: '2-digit'})}/${date.getFullYear()}`;
-    blog.updated_at = dateStr;
+    let date = new Date();
+    blog.updated_at = `${date.toLocaleString('default', {month: '2-digit'})}/${date.toLocaleString('default', {day: '2-digit'})}/${date.getFullYear()}`;
 
     await blogsCollection.updateOne({_id: new ObjectId(id)}, {"$set": blog});
     const update = await blogsCollection.findOne({_id: new ObjectId(id)});
