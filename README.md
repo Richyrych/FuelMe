@@ -34,6 +34,3 @@
 3. Open docker desktop. Open the project folder in a terminal. Run the command 'docker-compose up --build'
 4. Seed the database with the command 'docker exec -it edgerunners-server node tasks/index.js'
 5. Run the application from the docker desktop application
-
-## GitHub Repository
-* https://github.com/christendeo/EdgeRunners
