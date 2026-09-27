@@ -29,7 +29,7 @@
 
 ## Setup Installation
 1. Clone the Repository:
-`git clone https://github.com/christendeo/EdgeRunners.git`
+`git clone https://github.com/Richyrych/FuelMe.git`
 2. Copy `.env.example` to `.env` in the repository root and set `JWT_SECRET` to a random value of at least 16 characters.
 3. Open docker desktop. Open the project folder in a terminal. Run the command 'docker-compose up --build'
 4. Seed the database with the command 'docker exec -it edgerunners-server node tasks/index.js'
