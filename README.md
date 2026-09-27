@@ -1,10 +1,4 @@
 # FuelMe
-## CS554WS EdgeRunners Group Members:
-    Payton Bates 
-    Christen Diwen De Ocampo 
-    Richard Devitt
-    Anthony Eryan
-    Kayla Hartland
 
 ## Table of Contents
 * [Introduction](#introduction)
